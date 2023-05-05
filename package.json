@@ -12,7 +12,11 @@
   "description": "telegram bot for detox online course",
   "dependencies": {
     "@types/node": "^18.16.3",
+    "dotenv": "^16.0.3",
     "node-telegram-bot-api": "^0.61.0",
     "timers": "^0.1.1"
+  },
+  "devDependencies": {
+    "sqlite3": "^5.1.6"
   }
 }
