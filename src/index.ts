@@ -1,4 +1,5 @@
 import TelegramBot, { InlineKeyboardMarkup } from 'node-telegram-bot-api';
+import {setInterval} from 'timers';
 import express from 'express';
 import { saveUser, getUser, deleteUser, getUsers, getUsersCount } from './dataBase';
 
