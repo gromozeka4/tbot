@@ -68,6 +68,17 @@ export function getUser(chatId: number): Promise<User | undefined> {
   });
 }
 
+export function getUsersCount(): Promise<number> {
+  return new Promise((resolve, reject) => {
+    db.get(`SELECT COUNT(*) as count FROM users`, (err, row: { count: number }) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(row.count);
+      }
+    });
+  });
+}
 
 export function deleteUser(chatId: number): Promise<void> {
   return new Promise((resolve, reject) => {
