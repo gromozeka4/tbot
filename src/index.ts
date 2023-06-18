@@ -1,6 +1,6 @@
 import TelegramBot, {InlineKeyboardMarkup} from 'node-telegram-bot-api';
 import {setInterval} from 'timers';
-import {saveUser, getUser, deleteUser, getUsers} from './dataBase';
+import {saveUser, getUser, deleteUser, getUsers, getUsersCount} from './dataBase';
 
 require('dotenv').config();
 
@@ -180,6 +180,24 @@ bot.onText(/\/start/, async (msg) => {
       console.log(`[${new Date()}] New user with chatId: ${chatId}, currentStage: ${user.currentStage}`);
       bot.sendMessage(chatId, greating, startLearningKeyboard);
       saveUser({chatId, currentStage: 0, lastActive: Date.now()});
+  }
+});
+
+bot.onText(/\/getUsersCount/, async () => {
+  try {
+    const count: number = await getUsersCount();
+    console.log(count);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+bot.onText(/\/getUsersDetails/, async () => {
+  try {
+    const userDetails = await getUsers();
+    console.log(userDetails);
+  } catch (error) {
+    console.error(error);
   }
 });
 
