@@ -1,13 +1,28 @@
-import TelegramBot, {InlineKeyboardMarkup} from 'node-telegram-bot-api';
+import TelegramBot, { InlineKeyboardMarkup } from 'node-telegram-bot-api';
 import {setInterval} from 'timers';
-import {saveUser, getUser, deleteUser, getUsers, getUsersCount} from './dataBase';
+import express from 'express';
+import { saveUser, getUser, deleteUser, getUsers, getUsersCount } from './dataBase';
 
 require('dotenv').config();
 
-const bot = new TelegramBot(process.env.BOT_TOKEN, {polling: true});
+const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
+const app = express();
+
+// Handle incoming updates from Telegram
+app.use(express.json());
+app.post(`/bot${process.env.BOT_TOKEN}`, (req, res) => {
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
+});
+
+// Start the server
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
 
 const instagramLink = "https://instagram.com/trener_zdorovie?igshid=MzRlODBiNWFlZA=";
-const greating = "Всем привет! Очень рада, что вы интересуетесь этой темой, и я надеюсь, что мои видео будут полезными для вас. Если у вас возникнут вопросы, вы всегда можете задать их в директ в Instagram.\n\n" +
+const greeting = "Всем привет! Очень рада, что вы интересуетесь этой темой, и я надеюсь, что мои видео будут полезными для вас. Если у вас возникнут вопросы, вы всегда можете задать их в директ в Instagram.\n\n" +
   "Детокс - это не просто модное слово, а мощный инструмент, помогающий нам очищать организм от вредных веществ и восстанавливать естественное равновесие. В нашей современной жизни мы постоянно подвергаемся воздействию загрязненной окружающей среды, плохому питанию, стрессу и другим факторам, которые негативно сказываются на нашем здоровье и самочувствии. Детокс позволяет нам сбросить этот балласт и начать с чистого листа.\n\n" +
   "В своих видео я расскажу вам, из чего должен состоять правильный детокс, как запустить процессы очищения и поделюсь с вами детокс-рационом на один день.\n\n" +
   "Подписывайтесь на мой Instagram. Буду очень благодарна вам за отметки в сторис. Таким образом, вы поможете большему количеству людей узнать, как правильно помочь своему организму предотвратить многие болезни, наполниться энергией и восстановить баланс.\n\n" +
@@ -178,7 +193,7 @@ bot.onText(/\/start/, async (msg) => {
 
     default:
       console.log(`[${new Date()}] New user with chatId: ${chatId}, currentStage: ${user.currentStage}`);
-      bot.sendMessage(chatId, greating, startLearningKeyboard);
+      bot.sendMessage(chatId, greeting, startLearningKeyboard);
       saveUser({chatId, currentStage: 0, lastActive: Date.now()});
   }
 });
