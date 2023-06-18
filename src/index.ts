@@ -5,8 +5,12 @@ import { saveUser, getUser, deleteUser, getUsers, getUsersCount } from './dataBa
 
 require('dotenv').config();
 
-const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
+const bot = new TelegramBot(process.env.BOT_TOKEN);
 const app = express();
+
+const webhookUrl = `https://detoxcoursetelbot.onrender.com/${process.env.BOT_TOKEN}`;
+
+bot.setWebHook(webhookUrl);
 
 // Handle incoming updates from Telegram
 app.use(express.json());
