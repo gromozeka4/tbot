@@ -20,7 +20,6 @@ const youTubeLinkThree = "https://youtu.be/DjzCSy4J1u8";
 const testLinkOne = "https://docs.google.com/document/d/1T-HUsJ-Q3jF9iXKL3dC1jVE1zrrF9RkpAemVryqtn6U/edit?usp=sharing";
 const testLinkTwo = "https://docs.google.com/document/d/19qd6gxygZnK3VbEc-DWr-O0HWKNaL2Pr5Hbi_yplwHg/edit?usp=sharing";
 
-
 // Keyboards for different stages
 const startLearningKeyboard: InlineKeyboardMarkup = {
   reply_markup: {
@@ -40,7 +39,7 @@ const stageOneKeyboard: InlineKeyboardMarkup = {
     inline_keyboard: [
       [
         {
-          text: "Я выполнил тест 1",
+          text: "💪 Я выполнил тест 1 💪",
           callback_data: "stageOneCompleted",
         },
       ],
@@ -48,13 +47,12 @@ const stageOneKeyboard: InlineKeyboardMarkup = {
   }
 };
 
-
 const stageTwoKeyboard: InlineKeyboardMarkup = {
   reply_markup: {
     inline_keyboard: [
       [
         {
-          text: "Я выполнил тест 2",
+          text: "💪 Я выполнил тест 2 💪",
           callback_data: "stageTwoCompleted",
         },
       ],
@@ -78,8 +76,8 @@ bot.on('callback_query', async (query) => {
   console.log("user: " + JSON.stringify(user, null, 2));
 
   if (query.data === 'startLearningKeyboard') {
-    console.log("New course started");
-    bot.sendMessage(chatId, `Вот ссылка на первое видео: ${youTubeLinkOne}`);
+    console.log(`[${new Date()}] New course started`);
+    bot.sendMessage(chatId, `Ссылка на первое видео: ${youTubeLinkOne}`);
     await sleep();
     bot.sendMessage(chatId, `Тест #1: ${testLinkOne}`, stageOneKeyboard);
     saveUser({chatId, currentStage: 1, lastActive: Date.now()});
@@ -87,8 +85,8 @@ bot.on('callback_query', async (query) => {
     switch (user.currentStage) {
       case 1:
         if (query.data === 'stageOneCompleted') {
-          console.log("case 1: " + user.currentStage);
-          bot.sendMessage(chatId, `Вот ссылка на второе видео: ${youTubeLinkTwo}`);
+          console.log(`[${new Date()}] case1: chatId: ${chatId} - New action at stage ${user.currentStage}`);
+          bot.sendMessage(chatId, `Ссылка на второе видео: ${youTubeLinkTwo}`);
           await sleep();
           bot.sendMessage(chatId, `Тест #2: ${testLinkTwo}`, stageTwoKeyboard);
           saveUser({chatId, currentStage: 2, lastActive: Date.now()});
@@ -98,13 +96,13 @@ bot.on('callback_query', async (query) => {
       case 2:
         if (query.data === 'stageOneCompleted') {
           console.log("Stage one completed");
-          bot.sendMessage(chatId, `Вот ссылка на второе видео: ${youTubeLinkTwo}`);
+          bot.sendMessage(chatId, `Ссылка на второе видео: ${youTubeLinkTwo}`);
           await sleep();
           bot.sendMessage(chatId, `Тест #2: ${testLinkTwo}`, stageTwoKeyboard);
           saveUser({chatId, currentStage: 3, lastActive: Date.now()});
         } else if (query.data === 'stageTwoCompleted') {
-          console.log("case 2: " + user.currentStage);
-          bot.sendMessage(chatId, `Вот ссылка на третье видео: ${youTubeLinkThree}`);
+          console.log(`[${new Date()}] case2: chatId: ${chatId} - New action at stage ${user.currentStage}`);
+          bot.sendMessage(chatId, `Ссылка на третье видео: ${youTubeLinkThree}`);
           saveUser({chatId, currentStage: 3, lastActive: Date.now()});
         }
         break;
@@ -112,14 +110,14 @@ bot.on('callback_query', async (query) => {
       case 3:
         if (query.data === 'stageTwoCompleted') {
           console.log("Stage two completed");
-          bot.sendMessage(chatId, `Вот ссылка на третье видео: ${youTubeLinkThree}`);
+          bot.sendMessage(chatId, `Ссылка на третье видео: ${youTubeLinkThree}`);
           saveUser({chatId, currentStage: 4, lastActive: Date.now()});
         }
         break;
 
       default:
-        console.log("default case : " + user.currentStage);
-        bot.sendMessage(chatId, `Вот ссылка на первое видео: ${youTubeLinkOne}`);
+        console.log(`[${new Date()}] default case: chatId: ${chatId} - New action at stage ${user.currentStage}`);
+        bot.sendMessage(chatId, `Ссылка на первое видео: ${youTubeLinkOne}`);
         await sleep();
         bot.sendMessage(chatId, `Тест #1: ${testLinkOne}`, stageOneKeyboard);
         saveUser({chatId, currentStage: 1, lastActive: Date.now()});
@@ -137,24 +135,24 @@ bot.onText(/\/start/, async (msg) => {
 
   switch (user.currentStage) {
     case 1:
-      console.log("case 1: " + user.currentStage);
-      bot.sendMessage(chatId, `Вот ссылка на первое видео: ${youTubeLinkOne}`);
+      console.log(`[${new Date()}] case1: chatId: ${chatId} - New action at stage ${user.currentStage}`);
+      bot.sendMessage(chatId, `Ссылка на первое видео: ${youTubeLinkOne}`);
       await sleep();
       bot.sendMessage(chatId, `Тест #1: ${testLinkOne}`, stageOneKeyboard);
       saveUser({chatId, currentStage: 1, lastActive: Date.now()});
       break;
 
     case 2:
-      console.log("case 2: " + user.currentStage);
-      bot.sendMessage(chatId, `Вот ссылка на второе видео: ${youTubeLinkTwo}`);
+      console.log(`[${new Date()}] case2: chatId: ${chatId} - New action at stage ${user.currentStage}`);
+      bot.sendMessage(chatId, `Ссылка на второе видео: ${youTubeLinkTwo}`);
       await sleep();
       bot.sendMessage(chatId, `Тест #2: ${testLinkTwo}`, stageTwoKeyboard);
       saveUser({chatId, currentStage: 2, lastActive: Date.now()});
       break;
 
     case 3:
-      console.log("case 3: " + user.currentStage);
-      bot.sendMessage(chatId, `Вот ссылка на третье видео: ${youTubeLinkThree}`);
+      console.log(`[${new Date()}] case3: chatId: ${chatId} - New action at stage ${user.currentStage}`);
+      bot.sendMessage(chatId, `Ссылка на третье видео: ${youTubeLinkThree}`);
       saveUser({chatId, currentStage: 3, lastActive: Date.now()});
       break;
 
