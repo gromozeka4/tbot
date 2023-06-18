@@ -8,7 +8,7 @@ require('dotenv').config();
 const bot = new TelegramBot(process.env.BOT_TOKEN);
 const app = express();
 
-const webhookUrl = `https://detoxcoursetelbot.onrender.com`;
+const webhookUrl = `https://detoxcoursetelbot.onrender.com/bot${process.env.BOT_TOKEN}`;
 
 bot.setWebHook(webhookUrl);
 
