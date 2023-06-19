@@ -20,9 +20,9 @@ client.connect((err) => {
       console.log(`Database file ${dbPath} not found. Created a new one.`);
       client.query(`
         CREATE TABLE IF NOT EXISTS users (
-          chatId INTEGER PRIMARY KEY,
+          chatId BIGINT PRIMARY KEY,
           currentStage INTEGER NOT NULL,
-          lastActive INTEGER NOT NULL
+          lastActive BIGINT NOT NULL
         )
       `);
     }
