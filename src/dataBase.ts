@@ -12,16 +12,6 @@ const client = new Client({
 client.connect((err) => {
   if (err) {
     console.error(err.message);
-  // } else {if () {
-  //     console.log(`Database file ${dbPath} not found. Created a new one.`);
-  //     client.query(`
-  //       CREATE TABLE IF NOT EXISTS users (
-  //         chatId BIGINT PRIMARY KEY,
-  //         currentStage INTEGER NOT NULL,
-  //         lastActive BIGINT NOT NULL
-  //       )
-  //     `);
-    // }
   } else {
     console.log(`Connected to the PostgreSQL database`);
   }
@@ -66,7 +56,11 @@ export function getUser(chatId: number): Promise<User | undefined> {
           const user: User = { chatId, currentStage: 0, lastActive: Date.now() };
           resolve(user);
         } else {
-          const user = result.rows[0] as User;
+          const user = {
+            chatId: result.rows[0]['chatid'],
+            currentStage: result.rows[0]['currentstage'],
+            lastActive: result.rows[0]['lastactive'],
+          } as User;
           resolve(user);
         }
       }
