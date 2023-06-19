@@ -1,35 +1,42 @@
-import sqlite3 from 'sqlite3';
+import { Client } from 'pg'
 import * as fs from 'fs';
 import { User } from './types';
 
-const dbPath =  './dataBase.sqlite';
+const dbPath =  process.env.INTERNAL_DB_PATH;
 const dbExists = fs.existsSync(dbPath);
 
-const db = new sqlite3.Database(dbPath, (err) => {
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false // Set to true if PostgreSQL database requires SSL
+  }
+});
+
+client.connect((err) => {
   if (err) {
     console.error(err.message);
   } else {
     if (!dbExists) {
       console.log(`Database file ${dbPath} not found. Created a new one.`);
-      db.run(`
-        CREATE TABLE users (
+      client.query(`
+        CREATE TABLE IF NOT EXISTS users (
           chatId INTEGER PRIMARY KEY,
           currentStage INTEGER NOT NULL,
           lastActive INTEGER NOT NULL
         )
       `);
     }
-    console.log(`Connected to the SQLite database at ${dbPath}`);
+    console.log(`Connected to the PostgreSQL database`);
   }
 });
 
 export function getUsers(): Promise<User[]> {
   return new Promise((resolve, reject) => {
-    db.all(`SELECT * FROM users`, [], (err, rows) => {
+    client.query(`SELECT * FROM users`, (err, result) => {
       if (err) {
         reject(err);
       } else {
-        const users = rows.map((row) => row as User);
+        const users = result.rows as User[];
         resolve(users);
       }
     });
@@ -37,9 +44,11 @@ export function getUsers(): Promise<User[]> {
 }
 
 export function saveUser(user: User) {
-  const {chatId, currentStage, lastActive } = user;
-  db.run(
-    `INSERT OR REPLACE INTO users (chatId, currentStage, lastActive) VALUES (?, ?, ?)`,
+  const { chatId, currentStage, lastActive } = user;
+  client.query(
+    `INSERT INTO users (chatId, currentStage, lastActive) VALUES ($1, $2, $3)
+    ON CONFLICT (chatId)
+    DO UPDATE SET currentStage = $2, lastActive = $3`,
     [chatId, currentStage, lastActive],
     (err) => {
       if (err) {
@@ -51,16 +60,16 @@ export function saveUser(user: User) {
 
 export function getUser(chatId: number): Promise<User | undefined> {
   return new Promise((resolve, reject) => {
-    db.get(`SELECT * FROM users WHERE chatId = ?`, [chatId], (err, row) => {
+    client.query(`SELECT * FROM users WHERE chatId = $1`, [chatId], (err, result) => {
       if (err) {
         reject(err);
       } else {
-        if (!row) {
+        if (result.rows.length === 0) {
           console.log(`New user connected with chatId: ${chatId}`);
-          const user = { chatId, currentStage: 0, lastActive: Date.now() };
+          const user: User = { chatId, currentStage: 0, lastActive: Date.now() };
           resolve(user);
         } else {
-          const user = row as User;
+          const user = result.rows[0] as User;
           resolve(user);
         }
       }
@@ -70,11 +79,11 @@ export function getUser(chatId: number): Promise<User | undefined> {
 
 export function getUsersCount(): Promise<number> {
   return new Promise((resolve, reject) => {
-    db.get(`SELECT COUNT(*) as count FROM users`, (err, row: { count: number }) => {
+    client.query(`SELECT COUNT(*) as count FROM users`, (err, result) => {
       if (err) {
         reject(err);
       } else {
-        resolve(row.count);
+        resolve(result.rows[0].count);
       }
     });
   });
@@ -82,7 +91,7 @@ export function getUsersCount(): Promise<number> {
 
 export function deleteUser(chatId: number): Promise<void> {
   return new Promise((resolve, reject) => {
-    db.run(`DELETE FROM users WHERE chatId = ?`, [chatId], err => {
+    client.query(`DELETE FROM users WHERE chatId = $1`, [chatId], (err) => {
       if (err) {
         reject(err);
       } else {
