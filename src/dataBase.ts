@@ -1,9 +1,6 @@
 import { Client } from 'pg'
-import * as fs from 'fs';
 import { User } from './types';
 
-const dbPath =  process.env.INTERNAL_DB_PATH;
-const dbExists = fs.existsSync(dbPath);
 
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
@@ -15,17 +12,17 @@ const client = new Client({
 client.connect((err) => {
   if (err) {
     console.error(err.message);
+  // } else {if () {
+  //     console.log(`Database file ${dbPath} not found. Created a new one.`);
+  //     client.query(`
+  //       CREATE TABLE IF NOT EXISTS users (
+  //         chatId BIGINT PRIMARY KEY,
+  //         currentStage INTEGER NOT NULL,
+  //         lastActive BIGINT NOT NULL
+  //       )
+  //     `);
+    // }
   } else {
-    if (!dbExists) {
-      console.log(`Database file ${dbPath} not found. Created a new one.`);
-      client.query(`
-        CREATE TABLE IF NOT EXISTS users (
-          chatId BIGINT PRIMARY KEY,
-          currentStage INTEGER NOT NULL,
-          lastActive BIGINT NOT NULL
-        )
-      `);
-    }
     console.log(`Connected to the PostgreSQL database`);
   }
 });
