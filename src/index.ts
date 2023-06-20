@@ -247,6 +247,18 @@ setInterval(() => {
     .catch(err => {
       console.error(err.message);
     });
-}, 60 * 60 * 1000); // check every hour
+}, 24 * 60 * 60 * 1000); // check every 24 hours
 
 console.log('Bot is running...');
+
+// Function to bother the bot
+function botherBot() {
+  const chatId = 1042284839;
+  bot.sendMessage(chatId, 'ping');
+  console.log('Bot sent ping message to chat ID: ' + chatId + ' at ' + new Date().toLocaleString('en-US'));
+}
+
+botherBot(); // Bother the bot once when the server starts
+
+// Schedule bothering the bot every 14 minutes (14 minutes * 60 seconds * 1000 milliseconds)
+setInterval(botherBot, 14 * 60 * 1000);
